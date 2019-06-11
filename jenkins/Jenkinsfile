@@ -1,0 +1,27 @@
+pipeline{
+    agent any
+    tools{
+            maven "Maven"
+        }
+
+    parameters {
+            choice(name: "device", description: "Select Device to run automation on artemis", choices: ['LGV40ThinQ' ,'Nexus6P', 'Pixel2XL_Emu'])
+        }
+    stages{
+        stage('Run Android Test'){
+            steps{
+                script{
+                    String args = "configs/"
+                    args +="${params.device}.json"
+                    sh "mvn -Dconfig.file=${args} -Dapp=http://artemis:8091/view/experiements/job/get-tardis-apk/5/artifact/TardisHtw1002.apk test "
+                }
+            }
+            post {
+                always {
+                    junit 'reports/cucumber-results.xml'
+                }
+            }
+        }
+    }
+
+}
